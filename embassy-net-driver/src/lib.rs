@@ -2,6 +2,12 @@
 #![warn(missing_docs)]
 #![doc = include_str!("../README.md")]
 
+/// Ethernet PHY driver interface.
+pub mod phy;
+
+/// Ethernet Station Management Interface (SMI) driver interface.
+pub mod smi;
+
 use core::task::Context;
 
 /// Representation of an hardware address, such as an Ethernet address or an IEEE802.15.4 address.

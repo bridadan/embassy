@@ -10,7 +10,7 @@ use core::mem::MaybeUninit;
 use core::task::Context;
 
 use embassy_hal_internal::PeripheralType;
-use embassy_net_driver::{Capabilities, HardwareAddress, LinkState};
+use embassy_net_driver::{phy::Phy, smi::StationManagement, Capabilities, HardwareAddress, LinkState};
 use embassy_sync::waitqueue::AtomicWaker;
 
 pub use self::_version::{InterruptHandler, *};
@@ -157,23 +157,7 @@ impl<'a, 'd> embassy_net_driver::TxToken for TxToken<'a, 'd> {
     }
 }
 
-/// Station Management Interface (SMI) on an ethernet PHY
-pub trait StationManagement {
-    /// Read a register over SMI.
-    fn smi_read(&mut self, phy_addr: u8, reg: u8) -> u16;
-    /// Write a register over SMI.
-    fn smi_write(&mut self, phy_addr: u8, reg: u8, val: u16);
-}
 
-/// Trait for an Ethernet PHY
-pub trait Phy {
-    /// Reset PHY and wait for it to come out of reset.
-    fn phy_reset<S: StationManagement>(&mut self, sm: &mut S);
-    /// PHY initialisation.
-    fn phy_init<S: StationManagement>(&mut self, sm: &mut S);
-    /// Poll link to see if it is up and FD with 100Mbps
-    fn poll_link<S: StationManagement>(&mut self, sm: &mut S, cx: &mut Context) -> bool;
-}
 
 impl<'d, T: Instance, P: Phy> Ethernet<'d, T, P> {
     /// Directly expose the SMI interface used by the Ethernet driver.
