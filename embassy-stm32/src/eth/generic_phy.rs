@@ -7,7 +7,7 @@ use embassy_time::{Duration, Timer};
 #[cfg(feature = "time")]
 use futures_util::FutureExt;
 
-use super::{Phy, StationManagement};
+use super::{Phy, SerialManagement};
 
 #[allow(dead_code)]
 mod phy_consts {
@@ -90,7 +90,7 @@ fn blocking_delay_us(us: u32) {
 }
 
 impl Phy for GenericPhy {
-    fn phy_reset<S: StationManagement>(&mut self, sm: &mut S) {
+    fn phy_reset<S: SerialManagement>(&mut self, sm: &mut S) {
         // Detect SMI address
         if self.phy_addr == 0xFF {
             for addr in 0..32 {
@@ -112,7 +112,7 @@ impl Phy for GenericPhy {
         while sm.smi_read(self.phy_addr, PHY_REG_BCR) & PHY_REG_BCR_RESET == PHY_REG_BCR_RESET {}
     }
 
-    fn phy_init<S: StationManagement>(&mut self, sm: &mut S) {
+    fn phy_init<S: SerialManagement>(&mut self, sm: &mut S) {
         // Clear WU CSR
         self.smi_write_ext(sm, PHY_REG_WUCSR, 0);
 
@@ -124,7 +124,7 @@ impl Phy for GenericPhy {
         );
     }
 
-    fn poll_link<S: StationManagement>(&mut self, sm: &mut S, cx: &mut Context) -> bool {
+    fn poll_link<S: SerialManagement>(&mut self, sm: &mut S, cx: &mut Context) -> bool {
         #[cfg(not(feature = "time"))]
         cx.waker().wake_by_ref();
 
@@ -156,7 +156,7 @@ impl GenericPhy {
     }
 
     // Writes a value to an extended PHY register in MMD address space
-    fn smi_write_ext<S: StationManagement>(&mut self, sm: &mut S, reg_addr: u16, reg_data: u16) {
+    fn smi_write_ext<S: SerialManagement>(&mut self, sm: &mut S, reg_addr: u16, reg_data: u16) {
         sm.smi_write(self.phy_addr, PHY_REG_CTL, 0x0003); // set address
         sm.smi_write(self.phy_addr, PHY_REG_ADDAR, reg_addr);
         sm.smi_write(self.phy_addr, PHY_REG_CTL, 0x4003); // set data

@@ -62,7 +62,7 @@ async fn main(_spawner: Spawner) -> ! {
         mac_addr,
     );
 
-    let sm = device.station_management();
+    let sm = device.serial_management();
 
     // Just an example. Exact register settings depend on the specific PHY and test.
     sm.smi_write(PHY_ADDR, 0, 0x2100);

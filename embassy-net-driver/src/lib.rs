@@ -5,7 +5,7 @@
 /// Ethernet PHY driver interface.
 pub mod phy;
 
-/// Ethernet Station Management Interface (SMI) driver interface.
+/// Ethernet Serial Management Interface (SMI) driver interface.
 pub mod smi;
 
 use core::task::Context;

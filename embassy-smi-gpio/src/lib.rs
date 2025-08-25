@@ -1,6 +1,6 @@
 #![no_std]
 
-use embassy_net_driver::smi::StationManagement;
+use embassy_net_driver::smi::SerialManagement;
 use embedded_hal::delay::DelayNs;
 use embedded_hal::digital::{InputPin, OutputPin};
 
@@ -74,7 +74,7 @@ where
     }
 }
 
-impl<'d, Mdc, Mdio> StationManagement for SmiGpio<'d, Mdc, Mdio>
+impl<'d, Mdc, Mdio> SerialManagement for SmiGpio<'d, Mdc, Mdio>
 where
     Mdc: OutputPin,
     Mdio: InputPin + OutputPin,

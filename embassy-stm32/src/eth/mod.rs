@@ -10,7 +10,7 @@ use core::mem::MaybeUninit;
 use core::task::Context;
 
 use embassy_hal_internal::PeripheralType;
-use embassy_net_driver::{phy::Phy, smi::StationManagement, Capabilities, HardwareAddress, LinkState};
+use embassy_net_driver::{phy::Phy, smi::SerialManagement, Capabilities, HardwareAddress, LinkState};
 use embassy_sync::waitqueue::AtomicWaker;
 
 pub use self::_version::{InterruptHandler, *};
@@ -109,7 +109,7 @@ impl<'d, T: Instance, P: Phy> embassy_net_driver::Driver for Ethernet<'d, T, P> 
     }
 
     fn link_state(&mut self, cx: &mut Context) -> LinkState {
-        if self.phy.poll_link(&mut self.station_management, cx) {
+        if self.phy.poll_link(&mut self.serial_management, cx) {
             LinkState::Up
         } else {
             LinkState::Down
@@ -157,14 +157,12 @@ impl<'a, 'd> embassy_net_driver::TxToken for TxToken<'a, 'd> {
     }
 }
 
-
-
 impl<'d, T: Instance, P: Phy> Ethernet<'d, T, P> {
     /// Directly expose the SMI interface used by the Ethernet driver.
     ///
     /// This can be used to for example configure special PHY registers for compliance testing.
-    pub fn station_management(&mut self) -> &mut impl StationManagement {
-        &mut self.station_management
+    pub fn serial_management(&mut self) -> &mut impl SerialManagement {
+        &mut self.serial_management
     }
 
     /// Access the user-supplied `Phy`.

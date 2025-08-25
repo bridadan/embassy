@@ -53,7 +53,7 @@ pub struct Ethernet<'d, T: Instance, P: Phy> {
 
     pins: Pins<'d>,
     pub(crate) phy: P,
-    pub(crate) station_management: EthernetStationManagement<T>,
+    pub(crate) serial_management: EthernetSerialManagement<T>,
     pub(crate) mac_addr: [u8; 6],
 }
 
@@ -246,7 +246,7 @@ impl<'d, T: Instance, P: Phy> Ethernet<'d, T, P> {
             _peri: peri,
             pins,
             phy: phy,
-            station_management: EthernetStationManagement {
+            serial_management: EthernetSerialManagement {
                 peri: PhantomData,
                 clock_range: clock_range,
             },
@@ -279,8 +279,8 @@ impl<'d, T: Instance, P: Phy> Ethernet<'d, T, P> {
             w.set_tie(true);
         });
 
-        this.phy.phy_reset(&mut this.station_management);
-        this.phy.phy_init(&mut this.station_management);
+        this.phy.phy_reset(&mut this.serial_management);
+        this.phy.phy_init(&mut this.serial_management);
 
         interrupt::ETH.unpend();
         unsafe { interrupt::ETH.enable() };
@@ -374,12 +374,12 @@ impl<'d, T: Instance, P: Phy> Ethernet<'d, T, P> {
 }
 
 /// Ethernet station management interface.
-pub(crate) struct EthernetStationManagement<T: Instance> {
+pub(crate) struct EthernetSerialManagement<T: Instance> {
     peri: PhantomData<T>,
     clock_range: Cr,
 }
 
-impl<T: Instance> StationManagement for EthernetStationManagement<T> {
+impl<T: Instance> SerialManagement for EthernetSerialManagement<T> {
     fn smi_read(&mut self, phy_addr: u8, reg: u8) -> u16 {
         let mac = T::regs().ethernet_mac();
 
