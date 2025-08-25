@@ -68,6 +68,10 @@ where
         self.mdc.set_high().ok();
         self.delay.delay_us(1);
     }
+
+    fn turnaround_write(&mut self) {
+        self.write_bits(0b10, 2);
+    }
 }
 
 impl<'d, Mdc, Mdio> StationManagement for SmiGpio<'d, Mdc, Mdio>
@@ -99,6 +103,23 @@ where
     }
 
     fn smi_write(&mut self, phy_addr: u8, reg: u8, val: u16) {
-        // Implementation will go here
+        // Preamble
+        self.write_bits(0xFFFFFFFF, 32);
+
+        // Start of Frame + Opcode (write)
+        self.write_bits(0b0101, 4);
+
+        // PHY Address + Register Address
+        self.write_bits(u32::from(phy_addr), 5);
+        self.write_bits(u32::from(reg), 5);
+
+        // Turnaround
+        self.turnaround_write();
+
+        // Write data
+        self.write_bits(u32::from(val), 16);
+
+        // End with clock low, bus idle.
+        self.mdc.set_low().ok();
     }
 }
