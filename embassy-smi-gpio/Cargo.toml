@@ -1,0 +1,16 @@
+[package]
+name = "embassy-smi-gpio"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "A bit-banged SMI driver for embassy-net using GPIO."
+repository = "https://github.com/embassy-rs/embassy"
+documentation = "https://docs.embassy.dev/embassy-smi-gpio"
+categories = [
+    "embedded",
+    "no-std",
+]
+
+[dependencies]
+embassy-net-driver = { version = "0.2.0", path = "../embassy-net-driver" }
+embedded-hal = "1.0"
